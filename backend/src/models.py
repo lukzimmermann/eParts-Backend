@@ -7,9 +7,9 @@ metadata = Base.metadata
 class User(Base):
     __tablename__ = "user"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), unique=True)
-    password_hash = Column(String(128))
+    password_hash = Column(String(60))
     create_at = Column(DateTime, default=func.now())
     update_at = Column(DateTime)
     disabled = Column(Boolean, default=False)
