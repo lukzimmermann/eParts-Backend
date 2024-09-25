@@ -1,5 +1,3 @@
-
-import datetime
 from pydantic import BaseModel
 
 
@@ -13,10 +11,4 @@ class Signup(BaseModel):
     password: str
 
 class Token(BaseModel):
-    token: str
-
-class User(BaseModel):
-    username: str
-    create_at: datetime.datetime
-    update_at: datetime.datetime
-    disabled: bool
+    access_token: str
