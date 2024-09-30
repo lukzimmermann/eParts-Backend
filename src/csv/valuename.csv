@@ -1,0 +1,23 @@
+"id","group_id","name","unitbase_id"
+1,400,"Wiederstand",1
+2,800,"Toleranz",7
+3,150,"Durchlass-Spannung",5
+4,200,"Strom",11
+5,105,"min. Spannung",5
+6,110,"max. Spannung",5
+7,100,"Spannung",5
+8,205,"min. Strom",11
+9,210,"max. Strom",11
+10,700,"Raster",14
+11,120,"Steuerspannung",5
+12,215,"Schaltstrom",11
+13,125,"Schaltspannung",5
+14,600,"Frequenz",18
+15,605,"min. Frequenz",18
+16,610,"max. Frequenz",18
+17,300,"Leistung",9
+18,305,"min. Leistung",9
+19,310,"max. Leistung",9
+20,315,"Schaltleistung",9
+21,220,"Kollektorstrom",11
+22,500,"Kapazität",22

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.security import OAuth2PasswordBearer
 from routes.login import loginController
+from routes.product import productController
 
 app = FastAPI(title="eParts",
     description="Organize your electronic components and projects with ease. 🚀",
@@ -12,3 +13,4 @@ app = FastAPI(title="eParts",
 
 
 app.include_router(loginController.router)
+app.include_router(productController.router)

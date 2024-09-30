@@ -21,7 +21,7 @@ async def login(login: Login, response: Response) -> Message:
         # secure=True,
         samesite="lax"
     )
-    return Message(message="SLogin successful")
+    return Message(message="Login successful")
 
 
 @router.post("/signup")
