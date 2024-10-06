@@ -3,7 +3,7 @@ import time
 import json
 
 from sqlalchemy import Null
-from models import Attribute, Category, Price, Product, ProductAttribute, ProductSupplier, Supplier, Unit
+from models import Attribute, Category, Price, Product, ProductAttribute, ProductDocument, ProductSupplier, Supplier, Transaction, Unit
 from utils.database import Database
 from passlib.context import CryptContext
 import numpy as np
@@ -108,6 +108,30 @@ def import_price():
         session.add(price)
     session.commit()
 
+def import_document():
+    documents = _get_list_of_rows("src/csv/product_document.csv")
+    for element in documents:
+        document = ProductDocument(
+            id = element[0],
+            product_id = element[1],
+            description = element[2],
+            file_name = element[4]
+        )
+        print(document)
+        session.add(document)
+    session.commit()
+
+def import_transaction():
+    products = _get_list_of_rows('src/csv/product.csv')
+    for element in products:
+        transaction = Transaction(
+            product_id = element[0],
+            quantity = element[5]
+        )
+        print(transaction)
+        session.add(transaction)
+    session.commit()
+
 
 def _get_list_of_rows(path: str) -> list[list[str]]:
     rows = []
@@ -138,10 +162,11 @@ def main():
     #import_attribute()
     #import_product_attribute()
     #import_price()
+    #import_document()
+    import_transaction()
 
     product = session.query(Product).where(Product.id == 109).one_or_none()
 
-    print(product.suppliers[0].supplier.product_suppliers)
 
 if __name__ == "__main__":
     main()

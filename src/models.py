@@ -1,3 +1,4 @@
+from enum import Enum
 from pydantic_core import Url
 from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, ForeignKeyConstraint, String, Integer, Text, func
 from sqlalchemy.ext.declarative import declarative_base
@@ -19,7 +20,6 @@ class User(Base):
     def __repr__(self):
         return f"id: {self.id}, name: {self.name}, hash: {self.password_hash[:10]}..."
     
-
 class Product(Base):
     __tablename__ = "product"
 
@@ -51,7 +51,6 @@ class Category(Base):
     def __repr__(self):
         return f"id: {self.id}, name: {self.name}"
     
-
 class Supplier(Base):
     __tablename__ = "supplier"
 
@@ -79,7 +78,6 @@ class ProductSupplier(Base):
     def __repr__(self):
         return f"product id: {self.product_id}, supplier id: {self.supplier_id}, number: {self.number}, product page: {self.product_page[:20]}"
 
-
 class Unit(Base):
     __tablename__ = "unit"
 
@@ -92,8 +90,7 @@ class Unit(Base):
     #product_attributes = relationship("ProductAttribute", back_populates="unit")
 
     def __repr__(self):
-        return f"id: {self.id}, base id: {self.parent_id}, name: {self.name}"
-
+        return f"id: {self.id}, base id: {self.parent_id}, name: {self.name}, factor: {self.factor}"
 
 class Attribute(Base):
     __tablename__ = "attribute"
@@ -109,7 +106,6 @@ class Attribute(Base):
     def __repr__(self):
         return f"id: {self.id}, parent id: {self.parent_id}, unit id: {self.unit_id} name: {self.name}"
     
-
 class ProductAttribute(Base):
     __tablename__ = "product_attribute"
     
@@ -146,3 +142,44 @@ class Price(Base):
 
     def __repr__(self):
         return f"Product Id: {self.product_id}, Supplier Id: {self.supplier_id}, Quantity: {self.quantity}, Price: {self.price}"
+
+class ProductDocument(Base):
+    __tablename__ = "product_document"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    product_id = Column(Integer, ForeignKey('product.id'), primary_key=True,nullable=False)
+    description = Column(String(255), nullable=False)
+    file_name = Column(String(255), nullable=False)
+
+    def __repr__(self):
+        return f"id: {self.id}, product id: {self.product_id}, description: {self.description}, file name: {self.file_name}"
+    
+
+class Transaction(Base):
+    __tablename__ = "transaction"
+
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    product_id = Column(Integer, ForeignKey('product.id'), nullable=False)
+    quantity = Column(Float, nullable=False)
+    create_at = Column(DateTime, default=func.now(), nullable=False)
+
+    def __repr__(self):
+        return f'id: {self.id} product_id: {self.product_id} quantity: {self.quantity}'
+
+
+
+class Log(Base):
+    __tablename__ = "log"
+
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    create_at = Column(DateTime, default=func.now(), nullable=False)
+    level = Column(Integer, nullable=False)
+    url = Column(String(512), nullable=True)
+    method = Column(String(32), nullable=True)
+    process_time = Column(Float, nullable=True)
+    response_code = Column(Integer, nullable=True)
+    user = Column(String(255), nullable=True)
+    body = Column(String(4096), nullable=True)
+    
+    def __repr__(self):
+        return f'id: {self.id} create_at: {self.create_at} level: {self.level} url: {self.url} method: {self.method} response_code: {self.response_code} process_time: {self.process_time}'

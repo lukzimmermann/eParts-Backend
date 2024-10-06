@@ -3,11 +3,21 @@ from routes.login import loginService
 from routes.generalDto import Message
 from routes.product.productDto import ProductDto
 from utils.auth_bearer import JWTBearer
-from fastapi import APIRouter, Depends, Query, Response
-from routes.product.productService import get_product_from_db
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from routes.product.productService import fetch_product_by_id, fetch_products
 
 router = APIRouter(prefix="/product", tags=["Product"])
 
+"""
+Get all recorded products
+"""
 @router.get("/", dependencies=[Depends(JWTBearer())])
-async def get_product(product_id: Annotated[int, None], response: Response):
-    return get_product_from_db(product_id)
+async def get_products(response: Response) -> list[ProductDto]:
+    return fetch_products()
+
+"""
+Get product with specific id
+"""
+@router.get("/{product_id}", dependencies=[Depends(JWTBearer())])
+async def get_product(product_id: Annotated[int, None], response: Response) -> ProductDto:
+    return fetch_product_by_id(product_id)
