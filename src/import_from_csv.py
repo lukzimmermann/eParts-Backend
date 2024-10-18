@@ -3,10 +3,9 @@ import time
 import json
 
 from sqlalchemy import Null
-from models import Attribute, Category, Price, Product, ProductAttribute, ProductDocument, ProductSupplier, Supplier, Transaction, Unit
+from models import Attribute, Category, Organisation, Price, Product, ProductAttribute, ProductDocument, ProductSupplier, Supplier, Transaction, Unit, User, UserOrganisation
 from utils.database import Database
 from passlib.context import CryptContext
-import numpy as np
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 session = Database().get_session()
@@ -153,20 +152,46 @@ def print_all_attributes(allData):
             print(f"{e.attribute.name}: {e.numeric_value}{e.unit.name}")
         print()
 
+def create_user():
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+    organisation = Organisation()
+    organisation.name = "Schoggipopcorn"
+    session.add(organisation)
+    session.commit()
+
+    user = User()
+    user.email = "lukas.zimmermann@schoggipopcorn.ch"
+    user.first_name = "Lukas"
+    user.last_name = "Zimmermann"
+    user.job_title = "Software Engineer"
+    user.password_hash = pwd_context.hash("lukas")
+    session.add(user)
+    session.commit()
+
+    user = session.query(User).filter_by(email="lukas.zimmermann@schoggipopcorn.ch").first()
+    organisation = session.query(Organisation).filter_by(name="Schoggipopcorn").first()
+
+    user_organisation = UserOrganisation()
+    user_organisation.user = user
+    user_organisation.organisation = organisation
+    session.add(user_organisation)
+    session.commit()
+
+
+
 def main():
-    #import_category()
-    #import_products()
-    #import_supplier()
-    #import_product_supplier()
-    #import_unit()
-    #import_attribute()
-    #import_product_attribute()
-    #import_price()
-    #import_document()
+    create_user()
+    import_category()
+    import_products()
+    import_supplier()
+    import_product_supplier()
+    import_unit()
+    import_attribute()
+    import_product_attribute()
+    import_price()
+    import_document()
     import_transaction()
-
-    product = session.query(Product).where(Product.id == 109).one_or_none()
-
 
 if __name__ == "__main__":
     main()

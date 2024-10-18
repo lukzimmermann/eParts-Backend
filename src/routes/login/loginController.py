@@ -1,35 +1,35 @@
+from models import User
 from routes.login import loginService
 from routes.generalDto import Message
 from utils.auth_bearer import JWTBearer
-from fastapi import APIRouter, Depends, Response
-from routes.login.loginDto import Login, Signup, Token
+from fastapi import APIRouter, Depends, Response, Request
+from routes.login.loginDto import LoginDto, UserDto
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.get("/", dependencies=[Depends(JWTBearer())])
-async def get_user(response: Response) -> Message:
-    response.delete_cookie(key="Authorization:")
-    return Message(message="DiniMueter")
+async def get_user(request: Request, response: Response):
+    return loginService.get_user_from_token(request)
 
 @router.post("/login")
-async def login(login: Login, response: Response) -> Message:
-    token = loginService.getToken(login)
+async def login(login: LoginDto, response: Response) -> UserDto:
+    data = loginService.get_token(login)
     response.set_cookie(
         key="Authorization:",
-        value=f"Bearer {token}",
+        value=f"Bearer {data["token"]}",
         httponly=True,
         # secure=True,
         samesite="lax"
     )
-    return Message(message="Login successful")
-
-
-@router.post("/signup")
-async def login(signup: Signup) -> Token:
-    return "You are logged in"
+    return data["user"]
 
 @router.post("/logout")
 async def logout(response: Response) -> Message:
     response.delete_cookie(key="access_token")
     return Message(message="Successfully logged out")
+
+
+# @router.post("/signup")
+# async def login(signup: SignupDto) -> TokenDto:
+#     return "You are logged in"
 

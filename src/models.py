@@ -1,8 +1,8 @@
 from enum import Enum
 from pydantic_core import Url
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, ForeignKeyConstraint, String, Integer, Text, func
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, ForeignKeyConstraint, String, Integer, func
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -11,14 +11,39 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), unique=True, nullable=False)
+    email = Column(String(50), unique=True, nullable=False)
+    first_name = Column(String(50), nullable=False)
+    last_name = Column(String(50), nullable=False)
     password_hash = Column(String(60), nullable=False)
+    job_title = Column(String(50), nullable=True)
     create_at = Column(DateTime, default=func.now(), nullable=False)
     update_at = Column(DateTime, nullable=True)
     disabled = Column(Boolean, default=False, nullable=False)
 
     def __repr__(self):
-        return f"id: {self.id}, name: {self.name}, hash: {self.password_hash[:10]}..."
+        return f"id: {self.id}, name: {self.email}, hash: {self.password_hash[:10]}..."
+    
+class Organisation(Base):
+    __tablename__ = "organisation"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50), unique=True, nullable=False)
+    create_at = Column(DateTime, default=func.now(), nullable=False)
+
+
+class UserOrganisation(Base):
+    __tablename__ = "user_organisation"
+
+    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
+    organisation_id = Column(Integer, ForeignKey('organisation.id', ondelete='CASCADE'), primary_key=True)
+    join_date = Column(DateTime, default=func.now(), nullable=False)
+
+    user = relationship("User", backref=backref("organisations", cascade="all, delete"))
+    organisation = relationship("Organisation", backref=backref("users", cascade="all, delete"))
+
+    def __repr__(self):
+        return f"user_id: {self.user_id}, organisation_id: {self.organisation_id}, join_date: {self.join_date}"
+
     
 class Product(Base):
     __tablename__ = "product"
