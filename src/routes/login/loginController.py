@@ -16,6 +16,7 @@ async def login(login: LoginDto, response: Response) -> UserDto:
     data = loginService.get_token(login)
     response.set_cookie(
         key="Authorization:",
+        path="/",
         value=f"Bearer {data["token"]}",
         httponly=True,
         # secure=True,
@@ -25,7 +26,7 @@ async def login(login: LoginDto, response: Response) -> UserDto:
 
 @router.post("/logout")
 async def logout(response: Response) -> Message:
-    response.delete_cookie(key="access_token")
+    response.delete_cookie(key="Authorization", path="/")
     return Message(message="Successfully logged out")
 
 
