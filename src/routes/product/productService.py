@@ -2,7 +2,7 @@ from itertools import product
 from fastapi import HTTPException
 from sqlalchemy import func
 from models import Attribute, Category, Price, Product, ProductAttribute, ProductDocument, ProductSupplier, Supplier, Transaction, Unit
-from routes.product.productDto import AttributeDto, DocumentDto, PriceDto, ProductDto, SupplierDto, SupplierProductDto
+from routes.product.productDto import AttributeDto, DocumentDto, PriceDto, ProductDto, SupplierDto, SupplierProductDto, SimpleAttribute, UnitDto
 from utils.database import Database
 
 session = Database().get_session()
@@ -54,6 +54,26 @@ def fetch_product_by_id(product_id) -> Product:
         documents= __get_document(product_id)
         )
 
+def fetch_attributes():
+    attributes = session.query(Attribute).all()
+    return [SimpleAttribute(
+        id=attribute.id,
+        parent_id=attribute.parent_id,
+        unit_id=attribute.unit_id,
+        name=attribute.name,
+        isTitle=attribute.isTitle
+    ) for attribute in attributes]
+
+def fetch_units():
+    units = session.query(Unit).all()
+    return [UnitDto(
+        id=unit.id,
+        parent_id=unit.parent_id,
+        name=unit.name,
+        factor=unit.factor
+    ) for unit in units]
+
+
 def __get_category_name(category_id: int):
     return session.query(Category).where(Category.id == category_id).one().name
 
@@ -88,11 +108,14 @@ def __get_attribute_of_product(product_id):
         attributes.append(AttributeDto(
             id = attribute.id,
             parent_id = attribute.parent_id,
+            position=product_attribute.position,
             name = attribute.name,
             numeric_value = product_attribute.numeric_value,
             text_value = product_attribute.text_value,
+            unit_base_id = unit.parent_id,
             unit_id = unit.id,
-            unit_name = unit.name
+            unit_name = unit.name,
+            isTitle=attribute.isTitle
         ))
 
     return attributes

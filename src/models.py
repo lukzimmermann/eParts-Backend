@@ -122,8 +122,9 @@ class Attribute(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     parent_id = Column(Integer, nullable=True)
-    unit_id = Column(Integer, ForeignKey('unit.id'), nullable=False)
+    unit_id = Column(Integer, ForeignKey('unit.id'), nullable=True)
     name = Column(String(255), unique=True, nullable=False)
+    isTitle = Column(Boolean, nullable=False, default=False)
 
     #unit = relationship("Unit", back_populates="attributes")
     #product_attributes = relationship("ProductAttribute", back_populates="attribute")
@@ -139,6 +140,7 @@ class ProductAttribute(Base):
     attribute_id = Column(Integer, ForeignKey('attribute.id'), primary_key=True, nullable=False)
     text_value = Column(String(255), nullable=True)
     numeric_value = Column(Float, nullable=True)
+    position = Column(Integer, nullable=True)
 
     #product = relationship("Product", back_populates="attributes")
     #attribute = relationship("Attribute", back_populates="product_attributes")

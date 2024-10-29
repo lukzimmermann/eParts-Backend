@@ -20,11 +20,27 @@ class SupplierDto(BaseModel):
 class AttributeDto(BaseModel):
     id: int
     parent_id: int | None
+    isTitle: bool | None
     name: str
-    numeric_value: float
+    numeric_value: float | None
     text_value: str | None
-    unit_id: int
-    unit_name: str
+    unit_id: int | None
+    unit_base_id: int
+    unit_name: str | None
+    position: int | None
+
+class SimpleAttribute(BaseModel):
+    id: int
+    parent_id: int | None 
+    unit_id: int | None 
+    name: str
+    isTitle: bool
+
+class UnitDto(BaseModel):
+    id: int
+    parent_id: int | None
+    name: str
+    factor: float
 
 class DocumentDto(BaseModel):
     description: str

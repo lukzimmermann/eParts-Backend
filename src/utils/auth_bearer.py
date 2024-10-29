@@ -16,13 +16,13 @@ class JWTBearer(HTTPBearer):
     async def __call__(self, request: Request):
         token = request.cookies.get("Authorization:")
 
-        if token is None:
-            raise HTTPException(status_code=403, detail="No authorization token provided.")
-        if token.startswith("Bearer "):
-            token = token[len("Bearer "):]
-
-        if not self.verify_jwt(token):
-            raise HTTPException(status_code=403, detail="Invalid token or expired token.")
+        #if token is None:
+        #    raise HTTPException(status_code=403, detail="No authorization token provided.")
+        #if token.startswith("Bearer "):
+        #    token = token[len("Bearer "):]
+#
+        #if not self.verify_jwt(token):
+        #    raise HTTPException(status_code=403, detail="Invalid token or expired token.")
         return token
 
     def verify_jwt(self, token: str) -> bool:
