@@ -20,7 +20,8 @@ class SupplierDto(BaseModel):
 class AttributeDto(BaseModel):
     id: int
     parent_id: int | None
-    isTitle: bool | None
+    is_title: bool | None
+    is_numeric: bool | None
     name: str
     numeric_value: float | None
     text_value: str | None
@@ -34,7 +35,8 @@ class SimpleAttribute(BaseModel):
     parent_id: int | None 
     unit_id: int | None 
     name: str
-    isTitle: bool
+    is_title: bool
+    is_numeric: bool | None
 
 class UnitDto(BaseModel):
     id: int
