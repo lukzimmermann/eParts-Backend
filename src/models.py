@@ -122,7 +122,7 @@ class Attribute(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     parent_id = Column(Integer, nullable=True)
-    unit_id = Column(Integer, ForeignKey('unit.id'), nullable=True)
+    unit_base_id = Column(Integer, ForeignKey('unit.id'), nullable=True)
     name = Column(String(255), unique=True, nullable=False)
     is_title = Column(Boolean, default=False)
     is_numeric = Column(Boolean)

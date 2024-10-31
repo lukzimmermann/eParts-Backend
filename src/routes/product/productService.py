@@ -57,13 +57,13 @@ def fetch_product_by_id(product_id) -> Product:
 def fetch_attributes():
     attributes = session.query(Attribute).order_by(
         Attribute.is_title, 
-        Attribute.unit_id, 
+        Attribute.unit_base_id, 
         Attribute.name
     ).all()
     return [SimpleAttribute(
         id=attribute.id,
         parent_id=attribute.parent_id,
-        unit_id=attribute.unit_id,
+        unit_base_id=attribute.unit_base_id,
         name=attribute.name,
         is_title=attribute.is_title,
         is_numeric=attribute.is_numeric

@@ -28,12 +28,12 @@ class AttributeDto(BaseModel):
     unit_id: int | None
     unit_base_id: int
     unit_name: str | None
-    position: int | None
+    position: int
 
 class SimpleAttribute(BaseModel):
     id: int
     parent_id: int | None 
-    unit_id: int | None 
+    unit_base_id: int | None 
     name: str
     is_title: bool
     is_numeric: bool | None
