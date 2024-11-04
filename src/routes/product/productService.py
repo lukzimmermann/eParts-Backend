@@ -1,7 +1,8 @@
 from itertools import product
+from unicodedata import category
 from fastapi import HTTPException
 from sqlalchemy import func
-from models import Attribute, Category, Price, Product, ProductAttribute, ProductDocument, ProductSupplier, Supplier, Transaction, Unit
+from models import Attribute, Category, DocumentCategory, Price, Product, ProductAttribute, ProductDocument, ProductSupplier, Supplier, Transaction, Unit
 from routes.product.productDto import AttributeDto, DocumentDto, PriceDto, ProductDto, SupplierDto, SupplierProductDto, SimpleAttribute, UnitDto
 from utils.database import Database
 
@@ -127,15 +128,22 @@ def __get_attribute_of_product(product_id):
     return attributes
 
 def __get_document(product_id):
-    documents_response = session.query(ProductDocument).where(ProductDocument.product_id == product_id).all()
+    documents_response = (
+        session.query(ProductDocument, DocumentCategory)
+        .join(DocumentCategory, DocumentCategory.id == ProductDocument.category_id)
+        .where(ProductDocument.product_id == product_id)
+        .all()
+    )
 
     documents: list[DocumentDto] = []
+    print(documents_response)
 
-    for document in documents_response:
+    for document, category in documents_response:
         documents.append(DocumentDto(
-            description = document.description,
+            category=category.name,
+            description=document.description,
             type=document.file_name.split(".")[-1],
-            url = f"http://127.0.0.1:8000/api/product/document/{document.id}"
+            url=f"http://127.0.0.1:8000/api/product/document/{document.id}"
         ))
 
     return documents

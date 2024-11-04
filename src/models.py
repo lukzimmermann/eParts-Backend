@@ -131,7 +131,7 @@ class Attribute(Base):
     #product_attributes = relationship("ProductAttribute", back_populates="attribute")
 
     def __repr__(self):
-        return f"id: {self.id}, parent id: {self.parent_id}, unit id: {self.unit_id} name: {self.name}"
+        return f"id: {self.id}, parent id: {self.parent_id}, unit id: {self.unit_base_id} name: {self.name}"
     
 class ProductAttribute(Base):
     __tablename__ = "product_attribute"
@@ -171,17 +171,26 @@ class Price(Base):
     def __repr__(self):
         return f"Product Id: {self.product_id}, Supplier Id: {self.supplier_id}, Quantity: {self.quantity}, Price: {self.price}"
 
+class DocumentCategory(Base):
+    __tablename__ = "document_category"
+    
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    name = Column(String(50), unique=True, nullable=False)
+
 class ProductDocument(Base):
     __tablename__ = "product_document"
-
-    id = Column(Integer, primary_key=True, nullable=False)
-    product_id = Column(Integer, ForeignKey('product.id'), primary_key=True,nullable=False)
-    description = Column(String(255), nullable=False)
+    
+    id = Column(Integer, primary_key=True, nullable=False,  autoincrement=True)
+    product_id = Column(Integer, ForeignKey('product.id'), primary_key=True, nullable=False)
+    category_id = Column(Integer, ForeignKey('document_category.id'), nullable=False)
+    description = Column(String(255), nullable=True)
     file_name = Column(String(255), nullable=False)
+     
+    document_type = relationship("DocumentCategory")
 
     def __repr__(self):
-        return f"id: {self.id}, product id: {self.product_id}, description: {self.description}, file name: {self.file_name}"
-    
+        return f'id: {self.id} product_id: {self.product_id} category_id: {self.category_id}, filename: {self.file_name}'
+
 
 class Transaction(Base):
     __tablename__ = "transaction"

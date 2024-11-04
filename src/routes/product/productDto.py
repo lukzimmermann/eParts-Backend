@@ -1,4 +1,5 @@
 from typing import Optional
+from unicodedata import category
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -45,6 +46,7 @@ class UnitDto(BaseModel):
     factor: float
 
 class DocumentDto(BaseModel):
+    category : str
     description: str
     type: str
     url: str

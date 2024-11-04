@@ -1,12 +1,23 @@
+import os
 import csv
 import time
 import json
+import uuid
+from pathlib import Path
 
 from sqlalchemy import Null
-from models import Attribute, Category, Organisation, Price, Product, ProductAttribute, ProductDocument, ProductSupplier, Supplier, Transaction, Unit, User, UserOrganisation
+from models import Attribute, Category, DocumentCategory, Organisation, Price, Product, ProductAttribute, ProductDocument, ProductSupplier, Supplier, Transaction, Unit, User, UserOrganisation
 from utils.database import Database
 from passlib.context import CryptContext
+from minio import Minio
 
+MINIO_BUCKET = str(os.getenv('MINIO_BUCKET'))
+
+client = Minio( str(os.getenv('MINIO_HOST')),
+    access_key = str(os.getenv('MINIO_ACCESS_KEY')),
+    secret_key = str(os.getenv('MINIO_SECRET_KEY')),
+    secure = False,
+)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 session = Database().get_session()
 
@@ -73,8 +84,10 @@ def import_attribute():
         attribute = Attribute(
             id = element[0],
             parent_id = None,
-            unit_id = element[3],
-            name = element[2]
+            unit_base_id = element[3],
+            name = element[2],
+            is_title = False,
+            is_numeric = True
         )
         print(attribute)
         session.add(attribute)
@@ -88,7 +101,8 @@ def import_product_attribute():
             unit_id = element[2],
             attribute_id = element[3],
             text_value = None,
-            numeric_value = element[1]
+            numeric_value = element[1],
+            position = 1
         )
         print(product_attribute)
         session.add(product_attribute)
@@ -108,13 +122,38 @@ def import_price():
     session.commit()
 
 def import_document():
+    session.add(DocumentCategory(name = "Datasheet"))
+    session.add(DocumentCategory(name = "Pinout"))
+    session.commit()
+
     documents = _get_list_of_rows("src/csv/product_document.csv")
     for element in documents:
+        file_type = element[4].split(".")[-1].lower()
+        new_file_name = f'{uuid.uuid4()}.{file_type}'
+        category_id = ""
+        if element[2] == "Datasheet": category_id = 1
+        if element[2] == "Pinout": category_id = 2
+
+        file = Path('/Users/lukas/Desktop/DataSheets/' + element[4])
+
+        with file.open("rb") as file_data:
+            result = client.put_object(
+                MINIO_BUCKET, new_file_name, file_data,
+                length=-1,
+                part_size=10*1024*1024,
+            )
+            print(
+                "created {0} object; etag: {1}, version-id: {2}".format(
+                    result.object_name, result.etag, result.version_id,
+                ),
+        )
+    
         document = ProductDocument(
-            id = element[0],
-            product_id = element[1],
-            description = element[2],
-            file_name = element[4]
+             id = element[0],
+             product_id = element[1],
+             category_id = category_id,
+             description = "",
+             file_name = new_file_name
         )
         print(document)
         session.add(document)
@@ -181,17 +220,17 @@ def create_user():
 
 
 def main():
-    create_user()
-    import_category()
-    import_products()
-    import_supplier()
-    import_product_supplier()
-    import_unit()
-    import_attribute()
-    import_product_attribute()
-    import_price()
+    # create_user()
+    #import_category()
+    #import_products()
+    #import_supplier()
+    #import_product_supplier()
+    #import_unit()
+    #import_attribute()
+    #import_product_attribute()
+    #import_price()
+    #import_transaction()
     import_document()
-    import_transaction()
 
 if __name__ == "__main__":
     main()
